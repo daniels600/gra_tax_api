@@ -1,0 +1,31 @@
+name: GRA TAX API CI/CD
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Use Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '18'
+    - run: npm ci
+    - run: npm test
+      working-directory: ./functions
+
+  deploy:
+    # needs: test
+    name: Deploy to Firebase
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: jsryudev/deploy-firebase-functions@v18.0.0
+      env:
+        FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+        FIREBASE_PROJECT: gra-tax-5ce64

@@ -1,19 +1,41 @@
-/**
- * Import function triggers from their respective submodules:
- *
- * const {onCall} = require("firebase-functions/v2/https");
- * const {onDocumentWritten} = require("firebase-functions/v2/firestore");
- *
- * See a full list of supported triggers at https://firebase.google.com/docs/functions
- */
+
 
 const {onRequest} = require("firebase-functions/v2/https");
-const logger = require("firebase-functions/logger");
 
-// Create and deploy your first functions
-// https://firebase.google.com/docs/functions/get-started
+const express = require("express");
+const bodyParser = require("body-parser");
+const cors = require("cors");
+const helmet = require("helmet");
+const rateLimit = require('express-rate-limit');
+const middleware = require("./middleware");
+const apiRoutes = require("./routes");
 
-// exports.helloWorld = onRequest((request, response) => {
-//   logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
+
+
+const app = express();
+
+// Adding Middlewares 
+app.use(
+  bodyParser.urlencoded({
+      extended: true,
+      limit: "100mb"
+  })
+);
+app.use(bodyParser.json());
+
+const limiter = rateLimit({
+  windowMs: 10 * 60 * 1000, // 10 minutes
+  max: 100, // Limit each IP to 100 requests per `window` 
+  message: "Too many requests from this IP, please try again after 10 minutes."
+});
+
+middleware.setHeaders(app);
+app.use(helmet());
+app.use(limiter)
+
+app.use(cors());
+
+app.use("/v1", apiRoutes)
+
+// * Deploy the API Functions
+exports.api = onRequest(app);
