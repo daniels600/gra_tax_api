@@ -1,7 +1,7 @@
 const express = require("express")
 const { calculatePensionContributions, calculatePAYE, calculateNetSalary } = require("./utils/helper")
 const logger = require("firebase-functions/logger");
-const{ payloadSchema } =require("./utils/validations");
+const{ payloadSchema } = require("./utils/validations");
 
 const router = express.Router()
 
