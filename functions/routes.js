@@ -11,7 +11,7 @@ router.get("/", async (req, res) => {
 })
 
 router.post("/calculate-gross", async (req, res) => {
-  const { error, value } = salarySchema.validate(req.body);
+  const { error, value } = payloadSchema.validate(req.body);
 
   if (error) {
     return res.status(400).json({ error: error.details[0].message });
